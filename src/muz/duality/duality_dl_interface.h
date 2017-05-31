@@ -65,6 +65,8 @@ namespace Duality {
                
         void updt_params();
 
+        model_ref get_refutation();
+
         model_ref get_model();
 
         proof_ref get_proof();

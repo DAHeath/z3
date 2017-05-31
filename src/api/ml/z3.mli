@@ -3159,6 +3159,9 @@ sig
   (** Register predicate as recursive relation. *)
   val register_relation : fixedpoint -> FuncDecl.func_decl -> unit
 
+  (** Register variable as relation argument. *)
+  val register_variable : fixedpoint -> FuncDecl.func_decl -> unit
+
   (** Add rule into the fixedpoint solver. *)
   val add_rule : fixedpoint -> Expr.expr -> Symbol.symbol option -> unit
 
@@ -3193,7 +3196,13 @@ sig
   (** Retrieve satisfying instance or instances of solver,
       or definitions for the recursive predicates that show unsatisfiability. *)
   val get_answer : fixedpoint -> Expr.expr option
+                                           
+  (** Display certificate *)
+  val display_certificate : fixedpoint -> unit
 
+  (** Get refutation model (Duality only). *)
+  val get_refutation : fixedpoint -> Model.model option
+                                            
   (** Retrieve explanation why fixedpoint engine returned status Unknown. *)
   val get_reason_unknown : fixedpoint -> string
 

@@ -4000,6 +4000,14 @@ namespace Duality {
             for(unsigned j = 0; j < chs.size(); j++)
                 if(chs[j] == parent){
                     expr lit = GetRel(in_edge,j);
+                    if (parent->Name.arity() != lit.num_args() + new_params.size())
+                    {
+                        std::cout << "(cvoss) BUG! Looks like a relation "
+                            "appears twice on the LHS of a rule. Disambiguate "
+                            "by naming them P1,P2, and establish equivalence "
+                            "with P1 => P2, P2 => P1.\n";
+                        exit(0);
+                    }
                     expr new_lit = AddParamsToApp(lit,parent->Name,new_params);
                     func_decl fd = SuffixFuncDecl(new_lit,j);
                     int nargs = new_lit.num_args();

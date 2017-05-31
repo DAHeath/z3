@@ -146,6 +146,14 @@ extern "C" {
     Z3_ast Z3_API Z3_fixedpoint_get_answer(Z3_context c, Z3_fixedpoint d);
 
     /**
+       \brief Display certificate. 
+       def_API('Z3_fixedpoint_display_certificate', VOID, (_in(CONTEXT), _in(FIXEDPOINT)))
+    */
+    void Z3_API Z3_fixedpoint_display_certificate(Z3_context c, Z3_fixedpoint d);
+
+    Z3_model Z3_API Z3_fixedpoint_get_model(Z3_context c, Z3_fixedpoint d);
+
+    /**
        \brief Retrieve a string that describes the last status returned by #Z3_fixedpoint_query.
 
        Use this method when #Z3_fixedpoint_query returns Z3_L_UNDEF.
@@ -153,6 +161,13 @@ extern "C" {
        def_API('Z3_fixedpoint_get_reason_unknown', STRING, (_in(CONTEXT), _in(FIXEDPOINT) ))
     */
     Z3_string Z3_API Z3_fixedpoint_get_reason_unknown(Z3_context c, Z3_fixedpoint d);
+
+    /**
+       \brief Retrieve the model for the counterexample (Duality only).
+
+       def_API('Z3_fixedpoint_get_refutation', MODEL, (_in(CONTEXT), _in(FIXEDPOINT)))
+    */
+    Z3_model Z3_API Z3_fixedpoint_get_refutation(Z3_context c, Z3_fixedpoint d);
 
     /**
        \brief Update a named rule.
@@ -215,6 +230,13 @@ extern "C" {
        def_API('Z3_fixedpoint_register_relation', VOID, (_in(CONTEXT), _in(FIXEDPOINT), _in(FUNC_DECL)))
     */
     void Z3_API Z3_fixedpoint_register_relation(Z3_context c, Z3_fixedpoint d, Z3_func_decl f);
+
+    /**
+       \brief Register variable as Fixedpoint defined.
+
+       def_API('Z3_fixedpoint_register_variable', VOID, (_in(CONTEXT), _in(FIXEDPOINT), _in(FUNC_DECL)))
+    */
+    void Z3_API Z3_fixedpoint_register_variable(Z3_context c, Z3_fixedpoint d, Z3_func_decl f);
 
     /**
        \brief Configure the predicate representation.

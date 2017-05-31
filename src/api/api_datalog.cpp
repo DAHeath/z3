@@ -18,6 +18,7 @@ Revision History:
 #include"api_datalog.h"
 #include"api_context.h"
 #include"api_util.h"
+#include"api_model.h"
 #include"ast_pp.h"
 #include"api_ast_vector.h"
 #include"api_log_macros.h"
@@ -334,6 +335,46 @@ extern "C" {
         Z3_CATCH_RETURN(0);
     }
 
+    Z3_model Z3_API Z3_fixedpoint_get_model(Z3_context c, Z3_fixedpoint d) {
+        Z3_TRY;
+        LOG_Z3_fixedpoint_get_model(c, d);
+        RESET_ERROR_CODE();
+        model_ref _m = to_fixedpoint_ref(d)->ctx().get_model();
+        if (!_m) {
+            SET_ERROR_CODE(Z3_INVALID_USAGE);
+            RETURN_Z3(0);
+        }
+        Z3_model_ref * m_ref = alloc(Z3_model_ref, *mk_c(c)); 
+        m_ref->m_model = _m;
+        mk_c(c)->save_object(m_ref);
+        RETURN_Z3(of_model(m_ref));
+        Z3_CATCH_RETURN(0);
+    }
+
+    void Z3_API Z3_fixedpoint_display_certificate(Z3_context c, Z3_fixedpoint d) {
+        Z3_TRY;
+        LOG_Z3_fixedpoint_display_certificate(c, d);
+        RESET_ERROR_CODE();
+        to_fixedpoint_ref(d)->ctx().display_certificate(std::cout);
+        Z3_CATCH;
+    }
+
+    Z3_model Z3_API Z3_fixedpoint_get_refutation(Z3_context c, Z3_fixedpoint d) {
+        Z3_TRY;
+        LOG_Z3_fixedpoint_get_refutation(c, d);
+        RESET_ERROR_CODE();
+        model_ref _m = to_fixedpoint_ref(d)->ctx().get_refutation();
+        if (!_m) {
+            SET_ERROR_CODE(Z3_INVALID_USAGE);
+            RETURN_Z3(0);
+        }
+        Z3_model_ref * m_ref = alloc(Z3_model_ref, *mk_c(c));
+        m_ref->m_model = _m;
+        mk_c(c)->save_object(m_ref);
+        RETURN_Z3(of_model(m_ref));
+        Z3_CATCH_RETURN(0);
+    }
+
     Z3_string Z3_API Z3_fixedpoint_get_reason_unknown(Z3_context c,Z3_fixedpoint d) {
         Z3_TRY;
         LOG_Z3_fixedpoint_get_reason_unknown(c, d);
@@ -433,6 +474,12 @@ extern "C" {
         Z3_TRY;
         LOG_Z3_fixedpoint_register_relation(c, d, f);
         to_fixedpoint_ref(d)->ctx().register_predicate(to_func_decl(f), true);
+        Z3_CATCH;
+    }
+
+    void Z3_API Z3_fixedpoint_register_variable(Z3_context c, Z3_fixedpoint d, Z3_func_decl f) {
+        Z3_TRY;
+        to_fixedpoint_ref(d)->ctx().register_variable(to_func_decl(f));
         Z3_CATCH;
     }
 

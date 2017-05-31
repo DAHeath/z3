@@ -1816,6 +1816,7 @@ struct
     List.iter (Z3native.fixedpoint_assert (gc x) x) constraints
 
   let register_relation x = Z3native.fixedpoint_register_relation (gc x) x
+  let register_variable x = Z3native.fixedpoint_register_variable (gc x) x
 
   let add_rule (x:fixedpoint) (rule:expr) (name:Symbol.symbol option) =
     match name with
@@ -1845,6 +1846,13 @@ struct
     let q = Z3native.fixedpoint_get_answer (gc x) x in
     if Z3native.is_null_ast q then None else Some q
 
+  let display_certificate x =
+    Z3native.fixedpoint_display_certificate (gc x) x
+
+  let get_refutation x =
+    let q = Z3native.fixedpoint_get_refutation (gc x) x in
+    if Z3native.is_null_ast q then None else Some q
+                                            
   let get_reason_unknown x = Z3native.fixedpoint_get_reason_unknown (gc x) x
   let get_num_levels x = Z3native.fixedpoint_get_num_levels (gc x) x
 

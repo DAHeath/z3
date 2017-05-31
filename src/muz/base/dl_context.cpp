@@ -872,6 +872,11 @@ namespace datalog {
         return m_engine->get_model();
     }
 
+    model_ref context::get_refutation() {
+        ensure_engine();
+        return m_engine->get_refutation();
+    }
+
     proof_ref context::get_proof() {
         ensure_engine();
         return m_engine->get_proof();

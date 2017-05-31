@@ -83,6 +83,9 @@ namespace datalog {
         virtual model_ref get_model() {
             return model_ref(alloc(model, m));
         }
+        virtual model_ref get_refutation() {
+            return model_ref(alloc(model, m));
+        }
         virtual proof_ref get_proof() {
             return proof_ref(m.mk_asserted(m.mk_true()), m);
         }

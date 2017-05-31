@@ -506,6 +506,33 @@ namespace Duality {
         return expr_ref(m_ctx.get_manager());
     }
 
+    model_ref dl_interface::get_refutation() {
+        ast_manager &m = m_ctx.get_manager();
+        model_ref md(alloc(::model, m));
+        if(_d->status != StatusRefutation)
+            return model_ref(md);
+        // negation of the query is the last clause -- prove it
+        hash_set<func_decl> locals;
+        local_func_decls = &locals;
+        model orig_model = _d->cex.get_tree()->dualModel;
+        for(unsigned i = 0; i < orig_model.num_consts(); i++){
+            func_decl cnst = orig_model.get_const_decl(i);
+            if (locals.find(cnst) == locals.end()) {
+                expr thing = orig_model.get_const_interp(cnst);
+                md->register_decl(to_func_decl(cnst.raw()), to_expr(thing.raw()));
+            }
+        }
+        for(unsigned i = 0; i < orig_model.num_funcs(); i++){
+            func_decl cnst = orig_model.get_func_decl(i);
+            if (locals.find(cnst) == locals.end()) {
+                func_interp thing = orig_model.get_func_interp(cnst);
+                ::func_interp *thing_raw = thing;
+                md->register_decl(to_func_decl(cnst.raw()), thing_raw->copy());
+            }
+        }
+        return md;
+    }
+    
     void dl_interface::cancel() {
 #if 0
         if(_d && _d->ls)

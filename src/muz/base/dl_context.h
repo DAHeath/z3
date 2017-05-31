@@ -518,6 +518,13 @@ namespace datalog {
         model_ref get_model();
 
         /**
+           \brief retrieve model showing query is sat.
+           
+           \pre engine == 'duality' - this option is only for Duality mode.
+         */
+        model_ref get_refutation();
+
+        /**
            \brief retrieve proof from derivation of the query.
            
            \pre engine == 'pdr'  || engine == 'duality'- this option is only supported
@@ -545,7 +552,6 @@ namespace datalog {
            in the query that are derivable.
         */
         expr* get_answer_as_formula();
-
 
         void collect_statistics(statistics& st) const;
 
