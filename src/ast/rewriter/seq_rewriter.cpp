@@ -92,25 +92,25 @@ public:
         expr_ref fml(m.mk_true(), m);
         return sym_expr::mk_pred(fml, m.mk_bool_sort());
     }
-	virtual T mk_and(T x, T y) {
-		if (x->is_char() && y->is_char()) {
-			if (x->get_char() == y->get_char()) {
-				return x;
-			}
-			if (m.are_distinct(x->get_char(), y->get_char())) {
-				expr_ref fml(m.mk_false(), m);
-				return sym_expr::mk_pred(fml, x->get_sort());
-			}
-		}
+    virtual T mk_and(T x, T y) {
+        if (x->is_char() && y->is_char()) {
+            if (x->get_char() == y->get_char()) {
+                return x;
+            }
+            if (m.are_distinct(x->get_char(), y->get_char())) {
+                expr_ref fml(m.mk_false(), m);
+                return sym_expr::mk_pred(fml, x->get_sort());
+            }
+        }
 
-		sort* s = x->get_sort();
-		if (m.is_bool(s)) s = y->get_sort();
-		var_ref v(m.mk_var(0, s), m);
-		expr_ref fml1 = x->accept(v);
-		expr_ref fml2 = y->accept(v);
-		if (m.is_true(fml1)) {
-			return y;
-		}
+        sort* s = x->get_sort();
+        if (m.is_bool(s)) s = y->get_sort();
+        var_ref v(m.mk_var(0, s), m);
+        expr_ref fml1 = x->accept(v);
+        expr_ref fml2 = y->accept(v);
+        if (m.is_true(fml1)) {
+            return y;
+        }
         if (m.is_true(fml2)) return x;
         expr_ref fml(m.mk_and(fml1, fml2), m);
         return sym_expr::mk_pred(fml, x->get_sort());
@@ -178,10 +178,10 @@ public:
         return sym_expr::mk_pred(fml, x->get_sort());
     }
 
-	/*virtual vector<std::pair<vector<bool>, T>> generate_min_terms(vector<T> constraints){
-		
-		return 0;
-	}*/
+    /*virtual vector<std::pair<vector<bool>, T>> generate_min_terms(vector<T> constraints){
+        
+        return 0;
+    }*/
 };
 
 re2automaton::re2automaton(ast_manager& m): m(m), u(m), bv(m), m_ba(0), m_sa(0) {}
@@ -440,24 +440,16 @@ br_status seq_rewriter::mk_app_core(func_decl * f, unsigned num_args, expr * con
  * (seq.unit (_ BitVector 8)) ==> String constant
  */
 br_status seq_rewriter::mk_seq_unit(expr* e, expr_ref& result) {
-    sort * s = m().get_sort(e);
     bv_util bvu(m());
-
-    if (is_sort_of(s, bvu.get_family_id(), BV_SORT)) {
-        // specifically we want (_ BitVector 8)
-        rational n_val;
-        unsigned int n_size;
-        if (bvu.is_numeral(e, n_val, n_size)) {
-            if (n_size == 8) {
-                // convert to string constant
-                char ch = (char)n_val.get_int32();
-                TRACE("seq", tout << "rewrite seq.unit of 8-bit value " << n_val.to_string() << " to string constant \"" << ch << "\"" << std::endl;);
-                char s_tmp[2] = {ch, '\0'};
-                symbol s(s_tmp);
-                result = m_util.str.mk_string(s);
-                return BR_DONE;
-            }
-        }
+    rational n_val;
+    unsigned int n_size;
+    // specifically we want (_ BitVector 8)
+    if (bvu.is_bv(e) && bvu.is_numeral(e, n_val, n_size) && n_size == 8) {
+        // convert to string constant
+        zstring str(n_val.get_unsigned());
+        TRACE("seq", tout << "rewrite seq.unit of 8-bit value " << n_val.to_string() << " to string constant \"" << str<< "\"" << std::endl;);
+        result = m_util.str.mk_string(str);
+        return BR_DONE;
     }
 
     return BR_FAILED;
@@ -1431,36 +1423,9 @@ br_status seq_rewriter::mk_re_star(expr* a, expr_ref& result) {
 }
 
 /*
- * (re.range c_1 c_n) = (re.union (str.to.re c1) (str.to.re c2) ... (str.to.re cn))
+ * (re.range c_1 c_n) 
  */
 br_status seq_rewriter::mk_re_range(expr* lo, expr* hi, expr_ref& result) {
-    return BR_FAILED;
-    TRACE("seq", tout << "rewrite re.range [" << mk_pp(lo, m()) << " " << mk_pp(hi, m()) << "]\n";);
-    zstring str_lo, str_hi;
-    if (m_util.str.is_string(lo, str_lo) && m_util.str.is_string(hi, str_hi)) {
-        if (str_lo.length() == 1 && str_hi.length() == 1) {
-            unsigned int c1 = str_lo[0];
-            unsigned int c2 = str_hi[0];
-            if (c1 > c2) {
-                // exchange c1 and c2
-                unsigned int tmp = c1;
-                c2 = c1;
-                c1 = tmp;
-            }
-            zstring s(c1);
-            expr_ref acc(m_util.re.mk_to_re(m_util.str.mk_string(s)), m());
-            for (unsigned int ch = c1 + 1; ch <= c2; ++ch) {
-                zstring s_ch(ch);
-                expr_ref acc2(m_util.re.mk_to_re(m_util.str.mk_string(s_ch)), m());
-                acc = m_util.re.mk_union(acc, acc2);
-            }
-            result = acc;
-            return BR_REWRITE2;
-        } else {
-            m().raise_exception("string constants in re.range must have length 1");
-        }
-    }
-
     return BR_FAILED;
 }
 
@@ -1506,6 +1471,7 @@ br_status seq_rewriter::mk_re_opt(expr* a, expr_ref& result) {
 }
 
 br_status seq_rewriter::mk_eq_core(expr * l, expr * r, expr_ref & result) {
+    TRACE("seq", tout << mk_pp(l, m()) << " = " << mk_pp(r, m()) << "\n";);
     expr_ref_vector lhs(m()), rhs(m()), res(m());
     bool changed = false;
     if (!reduce_eq(l, r, lhs, rhs, changed)) {
