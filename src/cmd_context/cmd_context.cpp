@@ -15,6 +15,7 @@ Author:
 Notes:
 
 --*/
+
 #include<signal.h>
 #include"tptr.h"
 #include"cmd_context.h"
@@ -325,8 +326,8 @@ cmd_context::cmd_context(bool main_ctx, ast_manager * m, symbol const & l):
     m_status(UNKNOWN),
     m_numeral_as_real(false),
     m_ignore_check(false),
-    m_exit_on_error(false),
     m_processing_pareto(false),
+    m_exit_on_error(false),
     m_manager(m),
     m_own_manager(m == 0),
     m_manager_initialized(false),
@@ -1359,7 +1360,6 @@ void cmd_context::check_sat(unsigned num_assumptions, expr * const * assumptions
             throw ex;
         }
         catch (z3_exception & ex) {
-            get_opt()->display_assignment(regular_stream());
             throw cmd_exception(ex.msg());
         }
         if (m_processing_pareto && r != l_true) {
@@ -1397,7 +1397,7 @@ void cmd_context::check_sat(unsigned num_assumptions, expr * const * assumptions
     }
     validate_check_sat_result(r);
     if (was_opt && r != l_false && !m_processing_pareto) {
-        get_opt()->display_assignment(regular_stream());
+        // get_opt()->display_assignment(regular_stream());
     }
 
     if (r == l_true && m_params.m_dump_models) {
