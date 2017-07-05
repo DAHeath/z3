@@ -145,13 +145,19 @@ extern "C" {
     */
     Z3_ast Z3_API Z3_fixedpoint_get_answer(Z3_context c, Z3_fixedpoint d);
 
+
+    /**
+       \brief Retrieve the fixedpoint model.
+
+       def_API('Z3_fixedpoint_get_model', MODEL, (_in(CONTEXT), _in(FIXEDPOINT)))
+    */
+    Z3_model Z3_API Z3_fixedpoint_get_model(Z3_context c, Z3_fixedpoint d);
+
     /**
        \brief Display certificate. 
        def_API('Z3_fixedpoint_display_certificate', VOID, (_in(CONTEXT), _in(FIXEDPOINT)))
     */
     void Z3_API Z3_fixedpoint_display_certificate(Z3_context c, Z3_fixedpoint d);
-
-    Z3_model Z3_API Z3_fixedpoint_get_model(Z3_context c, Z3_fixedpoint d);
 
     /**
        \brief Retrieve a string that describes the last status returned by #Z3_fixedpoint_query.

@@ -3806,7 +3806,7 @@ namespace Duality {
 
         // undo hoisting of expressions out of loops
         RemoveDeadNodes();
-        Unhoist();
+        // Unhoist();
         // FuseEdges();
     }
 
